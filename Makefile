@@ -77,8 +77,10 @@ ALL_CXXFLAGS := -fno-rtti -fno-exceptions $(CXXFLAGS)
 
 SDL_CPPFLAGS := $(shell sdl2-config --cflags)
 PNG_CPPFLAGS := $(shell libpng-config --cflags)
+JPG_CPPFLAGS := $(shell pkg-config --cflags libjpeg)
+VRB_CPPFLAGS := $(shell pkg-config --cflags vorbis)
 
-ALL_CPPFLAGS := $(SDL_CPPFLAGS) $(PNG_CPPFLAGS) -Ishare
+ALL_CPPFLAGS := $(SDL_CPPFLAGS) $(PNG_CPPFLAGS) $(JPG_CPPFLAGS) $(VRB_CPPFLAGS) -Ishare
 
 ALL_CPPFLAGS += \
 	-DCONFIG_USER=\"$(USERDIR)\" \
@@ -147,7 +149,8 @@ ALL_CPPFLAGS += $(HMD_CPPFLAGS)
 # Libraries
 
 SDL_LIBS := $(shell sdl2-config --libs)
-PNG_LIBS := $(shell libpng-config --libs)
+PNG_LIBS := $(shell pkg-config --libs libpng)
+JPG_LIBS := $(shell pkg-config --libs libjpeg)
 
 ENABLE_FS := stdio
 ifeq ($(ENABLE_FS),stdio)
@@ -205,14 +208,14 @@ ifeq ($(PLATFORM),haiku)
 	endif
 endif
 
-BASE_LIBS := -ljpeg $(PNG_LIBS) $(FS_LIBS) -lm
+BASE_LIBS := $(JPG_LIBS) $(PNG_LIBS) $(FS_LIBS) -lm
 
 ifeq ($(PLATFORM),darwin)
 	BASE_LIBS += $(patsubst %, -L%, $(wildcard /opt/local/lib \
 	                                           /usr/local/lib))
 endif
 
-OGG_LIBS := -lvorbisfile
+OGG_LIBS := $(shell pkg-config --libs vorbis vorbisfile)
 TTF_LIBS := -lSDL2_ttf
 
 ifeq ($(PLATFORM),haiku)
